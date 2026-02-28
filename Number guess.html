@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Ultimate Guess The Number</title>
+<style>
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:linear-gradient(135deg,#141e30,#243b55);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    color:white;
+}
+
+.game-box{
+    background:#111827;
+    padding:30px;
+    border-radius:20px;
+    width:380px;
+    text-align:center;
+    box-shadow:0 0 30px #00ffff;
+}
+
+h1{
+    color:#00ffff;
+}
+
+select,input{
+    padding:10px;
+    width:85%;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    font-size:15px;
+    text-align:center;
+}
+
+button{
+    margin-top:12px;
+    padding:10px 20px;
+    border:none;
+    border-radius:30px;
+    font-size:15px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.check-btn{
+    background:#00ffff;
+    color:black;
+}
+
+.reset-btn{
+    background:#ff4b2b;
+    color:white;
+}
+
+button:hover{
+    transform:scale(1.1);
+    box-shadow:0 0 20px #00ffff;
+}
+
+#message{
+    margin-top:15px;
+    font-weight:bold;
+    min-height:24px;
+}
+
+.stats{
+    margin-top:12px;
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game-box">
+    <h1>Ultimate Guess Game</h1>
+
+    <select id="level" onchange="setLevel()">
+        <option value="easy">Easy (1-50)</option>
+        <option value="medium">Medium (1-100)</option>
+        <option value="hard">Hard (1-200)</option>
+    </select>
+
+    <input type="number" id="guessInput" placeholder="Enter your guess">
+
+    <button class="check-btn" onclick="checkGuess()">Check</button>
+    <button class="reset-btn" onclick="resetGame()">Reset</button>
+
+    <div id="message"></div>
+
+    <div class="stats">
+        Attempts Left: <span id="attempts"></span><br>
+        Best Score: <span id="bestScore">-</span>
+    </div>
+</div>
+
+<script>
+let randomNumber;
+let maxNumber = 50;
+let attemptsLeft;
+let maxAttempts;
+
+function setLevel(){
+    let level = document.getElementById("level").value;
+
+    if(level === "easy"){
+        maxNumber = 50;
+        maxAttempts = 10;
+    }
+    else if(level === "medium"){
+        maxNumber = 100;
+        maxAttempts = 8;
+    }
+    else{
+        maxNumber = 200;
+        maxAttempts = 6;
+    }
+
+    resetGame();
+}
+
+function startGame(){
+    randomNumber = Math.floor(Math.random() * maxNumber) + 1;
+    attemptsLeft = maxAttempts;
+    document.getElementById("attempts").innerHTML = attemptsLeft;
+}
+
+function checkGuess(){
+    let guess = Number(document.getElementById("guessInput").value);
+    let message = document.getElementById("message");
+
+    if(!guess){
+        message.innerHTML = "Enter a valid number!";
+        return;
+    }
+
+    attemptsLeft--;
+    document.getElementById("attempts").innerHTML = attemptsLeft;
+
+    if(guess === randomNumber){
+        message.innerHTML = "🎉 Correct! You win!";
+        message.style.color = "#00ff88";
+        saveBestScore(attemptsLeft);
+    }
+    else if(attemptsLeft <= 0){
+        message.innerHTML = "💀 Game Over! Number was " + randomNumber;
+        message.style.color = "#ff4b2b";
+    }
+    else if(guess > randomNumber){
+        message.innerHTML = "Too High!";
+        message.style.color = "#ffcc00";
+    }
+    else{
+        message.innerHTML = "Too Low!";
+        message.style.color = "#ffcc00";
+    }
+}
+
+function resetGame(){
+    document.getElementById("guessInput").value = "";
+    document.getElementById("message").innerHTML = "";
+    startGame();
+    loadBestScore();
+}
+
+function saveBestScore(score){
+    let best = localStorage.getItem("bestScore");
+    if(!best || score > best){
+        localStorage.setItem("bestScore", score);
+    }
+    loadBestScore();
+}
+
+function loadBestScore(){
+    let best = localStorage.getItem("bestScore");
+    document.getElementById("bestScore").innerHTML = best ? best : "-";
+}
+
+setLevel();
+</script>
+
+</body>
+</html>
